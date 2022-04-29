@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fizika projekat</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    
+    <header class="header">    
+        <!-- potrebne stvari sa header: 
+            odabir elementa, vrste cestica i zastitnog materijala (olovo, papir, aluminijum)
+            stvari za prevlacenje elementa i stavljanje detektora i elementa-->
+            <nav class="navbar">
+                <h1 class="whiteText">Radioaktivnost i sprecavanje zracenja</h1>
+
+                <div class="dropdown_menus">
+                    <div class="dropdown">
+                        <button onclick="myFunction('sourceDropdown')" class="dropButton">Izaberi izvor </button>
+                        <div id="sourceDropdown" class="dropdown-content">
+                        <a >Uranijum 69</a>
+                        <a >Uranijum 420</a>
+                        <a >Kobalt 60</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <button onclick="myFunction('shieldDropdown')" class="dropButton">Izaberi stit </button>
+                        <div id="shieldDropdown" class="dropdown-content">
+                        <a >Papir</a>
+                        <a >Aluminijum</a>
+                        <a >Olovo</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <button onclick="myFunction('particleDropdown')" class="dropButton">Izaberi cesticu </button>
+                        <div id="particleDropdown" class="dropdown-content">
+                        <a >Alfa</a>
+                        <a >Beta</a>
+                        <a >Gama</a>
+                        </div>
+                    </div>
+                  </div>
+
+            </nav>
+    </header>
+
+    <main class="main">
+        <!-- polja za stavljanje podataka -->
+        <div class="objectPlacement">
+
+            <div class="singleObject">
+                <div class="objectImage">
+                    <img src="download.png">
+                </div>
+                <p class="whiteText"> Izvor </p>
+            </div>
+
+            <div class="singleObject">
+                <div class="objectImage">
+                    <img src="detector.png">
+                </div>
+                <p class="whiteText"> Detektor </p>
+            </div>
+
+            <div class="singleObject">
+                <div class="objectImage">
+                    <img src="x.png">
+                </div>
+                <p class="whiteText"> Stit </p>
+            </div>
+
+            <div class="singleObject">
+                <div class="objectImage">
+                    <img src="eraser.png">
+                </div>
+                <p class="whiteText"> Obrisi </p>
+            </div>
+
+            <div class="distanceCalculator">
+                <h2 class="whiteText">Distanca: </h2>
+            </div>
+
+        </div>
+
+    </main>
+
+    <table id="table-id"></table>
+
+
+    <script src="index.js"></script>
+
+</body>
+</html>
