@@ -19,29 +19,29 @@
 
                 <div class="dropdown_menus">
                     <div class="dropdown">
-                        <button onclick="myFunction('sourceDropdown')" class="dropButton">Izaberi izvor </button>
+                        <button onclick="dropdownFunction('sourceDropdown')" class="dropButton">Izaberi izvor </button>
                         <div id="sourceDropdown" class="dropdown-content">
-                        <a >Uranijum 69</a>
-                        <a >Uranijum 420</a>
-                        <a >Kobalt 60</a>
+                        <a id="source_1">Uranijum</a>
+                        <a id="source_2">Polonijum</a>
+                        <a id="source_3">Kobalt 60</a>
                         </div>
                     </div>
 
                     <div class="dropdown">
-                        <button onclick="myFunction('shieldDropdown')" class="dropButton">Izaberi stit </button>
+                        <button onclick="dropdownFunction('shieldDropdown')" class="dropButton">Izaberi stit </button>
                         <div id="shieldDropdown" class="dropdown-content">
-                        <a >Papir</a>
-                        <a >Aluminijum</a>
-                        <a >Olovo</a>
+                        <a id="shield_1">Papir</a>
+                        <a id="shield_2">Aluminijum</a>
+                        <a id="shield_3">Olovo</a>
                         </div>
                     </div>
 
                     <div class="dropdown">
-                        <button onclick="myFunction('particleDropdown')" class="dropButton">Izaberi cesticu </button>
+                        <button onclick="dropdownFunction('particleDropdown')" class="dropButton">Izaberi cesticu </button>
                         <div id="particleDropdown" class="dropdown-content">
-                        <a >Alfa</a>
-                        <a >Beta</a>
-                        <a >Gama</a>
+                        <a id="particle_1">Alfa</a>
+                        <a id="particle_2">Beta</a>
+                        <a id="particle_3">Gama</a>
                         </div>
                     </div>
                   </div>
@@ -55,39 +55,49 @@
 
             <div class="singleObject">
                 <div id="source_div" class="objectImage">
-                    <img id="source" src="download.png">
+                    <img id="source" src="img/download.png" draggable="true" ondragstart="drag(event)">
                 </div>
                 <p class="whiteText"> Izvor </p>
             </div>
 
             <div class="singleObject">
                 <div id="detector_div" class="objectImage">
-                    <img id="detector" src="detector.png">
+                    <img id="detector" src="img/detector.png" draggable="true" ondragstart="drag(event)">
                 </div>
                 <p class="whiteText"> Detektor </p>
             </div>
 
-            <div class="singleObject">
-                <div id="shield_div" class="objectImage">
-                    <img id="shield" src="x.png">
+            <div id="shield_div" class="singleObject">
+                <div class="objectImage">
+                    <img id="shield" src="img/x.png">
                 </div>
                 <p class="whiteText"> Stit </p>
             </div>
 
-            <div class="singleObject">
-                <div id="eraser_div"class="objectImage">
-                    <img id="eraser" src="eraser.png">
+            <div id="eraser_div" class="singleObject">
+                <div class="objectImage">
+                    <img id="eraser" src="img/eraser.png">
                 </div>
                 <p class="whiteText"> Obrisi </p>
             </div>
 
-            <div class="distanceCalculator">
-                <h2 class="whiteText">Distanca: 123 </h2>
+            <div class="singleObject">
+                <div class="distanceCalculator">
+                    <h2 id="distance" class="whiteText">Distanca: </h2>
+                </div>
             </div>
 
-            <div class="radioactivityCalculator">
-                <h2 class="whiteText">Radiaktivnost: 123 </h2>
+            <div class="singleObject">
+                <div class="radioactivityCalculator">
+                    <h2 id="radioactivity" class="whiteText">Radiaktivnost: </h2>
+                </div>
             </div>
+
+            <div class="singleObject">
+                <button id="start" type="button">Pokreni</button>
+            </div>
+
+
 
         </div>
 

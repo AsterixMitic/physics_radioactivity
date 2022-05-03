@@ -1,5 +1,4 @@
-function myFunction(x) {
-    
+function dropdownFunction(x) {
     document.getElementById(x).classList.toggle("show");
   }
   
@@ -17,10 +16,14 @@ function myFunction(x) {
     }
   }
 
-  let cellWithStartPoint = -1, cellWithEndPoint = -1;
-  let listOFBlockCells = [];
-  let isRoadBuilding = false;
-  
+let cellWithStartPoint = -1, cellWithEndPoint = -1;
+let listOFBlockCells = [];
+let isRoadBuilding = false;
+
+let sourceElement = "Uranijum";
+let shield = "Papir";
+let particle = "Alfa";
+
   function allowDrop(ev) {
       ev.preventDefault();
   }
@@ -33,17 +36,13 @@ function myFunction(x) {
       if(!isRoadBuilding){
           let data = ev.dataTransfer.getData("text");
           if(ev.target.nodeName != 'IMG' && document.getElementById(data) != null){
-              if(data == "startPoint")
+              if(data == "source")
                   cellWithStartPoint = parseInt(ev.target.id);
-              if(data == "endPoint")
+              if(data == "detector")
                   cellWithEndPoint = parseInt(ev.target.id);
               ev.target.appendChild(document.getElementById(data));    
           }
       }
-  }
-  
-  function startDropdown() {
-      document.getElementById("myDropdown").classList.toggle("show");
   }
   
   let table = () => {
@@ -53,13 +52,10 @@ function myFunction(x) {
       let isMousePressedWithEraserActive = false;
       let numberOfCollums = 0;
       let numberOfRows = 0;
-      let whichAlgo = 1;
-      let INF = 10000000;
       let directions = [{x:0, y:-1}, {x:-1, y:0}, {x:0, y:1}, {x:1, y:0}];
       let isRoadActive = false;
       let roads = []
       let standbys = []
-      let globalDistance;
   
       function constructCords(numberOfCell){
           let x = Math.floor((numberOfCell - 1) / numberOfCollums);
@@ -90,7 +86,7 @@ function myFunction(x) {
       function addNewBlock(obj){
           if(!isRoadBuilding){
               const newBlock = document.createElement("img");
-              newBlock.src = "img\\block2.png"
+              newBlock.src = "img\\x.png"
               newBlock.class = "block"
               newBlock.draggable = false;
               if(obj.childElementCount == 0){
@@ -113,7 +109,7 @@ function myFunction(x) {
   
       function addNewRoad(i, j){
           const newRoad = document.createElement("img");
-          newRoad.src = "img\\road.png"        
+          newRoad.src = "img\\x.png"        
           newRoad.draggable = false;
           newRoad.class = "road"
           let obj = document.getElementById(String(deconstructCords(i, j)));
@@ -125,7 +121,7 @@ function myFunction(x) {
   
       function addNewStandBy(i, j){
           const newStandBy = document.createElement("img");
-          newStandBy.src = "img\\standby.png"        
+          newStandBy.src = "img\\x.png"        
           newStandBy.draggable = false;
           newStandBy.class = "standby"
           let obj = document.getElementById(String(deconstructCords(i, j)));
@@ -220,166 +216,6 @@ function myFunction(x) {
           }, 30);
       }
   
-      function visualiseDijsktraAdded(){
-          if(isRoadActive){
-              removeRoads();
-              let startPoint = constructCords(cellWithStartPoint)
-              let endPoint = constructCords(cellWithEndPoint)
-  
-              if(globalDistance[endPoint.x][endPoint.y] == INF){
-                  alert("There are no paths");
-                  isRoadActive = false;
-              }else{
-                  isRoadActive = true;
-                  isRoadBuilding = true;
-                  recursionForRoad(startPoint.x, startPoint.y, endPoint.x, endPoint.y, endPoint.x, endPoint.y, globalDistance);
-              }
-          }
-      }
-  
-      function dijkstraSetupPart3(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound){
-          let topCell = prioQueue.dequeue();
-          if(processed[topCell.x][topCell.y])
-              dijkstraSetupPart2(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound)
-          processed[topCell.x][topCell.y] = true;
-          addNewStandBy(topCell.x, topCell.y);
-          standbys.push(deconstructCords(topCell.x, topCell.y))
-          if(endPoint.x == topCell.x && endPoint.y == topCell.y)
-              isEndPointFound = true;
-  
-          for(let i = 0; i < 4; ++i){
-              let newCordX = topCell.x + directions[i].x, newCordY = topCell.y + directions[i].y;
-              if(newCordX < 0 || newCordX >= numberOfRows || newCordY < 0 || newCordY >= numberOfCollums)
-                  continue;
-              if(isBlockHere[newCordX][newCordY])
-                  continue;
-              if(distance[topCell.x][topCell.y] + 1 < distance[newCordX][newCordY]){
-                  distance[newCordX][newCordY] = distance[topCell.x][topCell.y] + 1;
-                  prioQueue.queue({dist: -distance[newCordX][newCordY], x: newCordX,  y: newCordY});
-              }
-          }
-          dijkstraSetupPart2(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound)
-      }
-  
-      function dijkstraSetupPart2(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound){
-          if(prioQueue.length == 0){
-              globalDistance = distance;
-              removeStandBys();
-  
-              if(distance[endPoint.x][endPoint.y] == INF){
-                  alert("There are no paths");
-                  isRoadActive = false;
-              }else{
-                  isRoadActive = true;
-                  recursionForRoad(startPoint.x, startPoint.y, endPoint.x, endPoint.y, endPoint.x, endPoint.y, distance);
-              }
-          }else{
-              if(!isEndPointFound){
-                  setTimeout(() => {
-                      dijkstraSetupPart3(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound)
-                  }, 0);
-              }else{
-                  dijkstraSetupPart3(prioQueue, distance, isBlockHere, processed, startPoint, endPoint, isEndPointFound)
-              }
-          }
-  
-      }
-  
-      function visualiseDijkstra(){
-          removeRoads();
-          let startPoint = constructCords(cellWithStartPoint)
-          let endPoint = constructCords(cellWithEndPoint)
-  
-          let isBlockHere = create2DArray(numberOfRows, numberOfCollums);
-          let distance = create2DArray(numberOfRows, numberOfCollums);
-          let processed = create2DArray(numberOfRows, numberOfCollums);
-  
-          fill2DArray(processed, false);
-          fill2DArray(distance, INF);
-          fill2DArrayForBlocks(isBlockHere);
-  
-          distance[startPoint.x][startPoint.y] = 0;
-  
-          let prioQueue = new PriorityQueue({ comparator: function(a, b) { return b.dist - a.dist; }});
-          
-          prioQueue.queue({dist: 0, x: startPoint.x,  y: startPoint.y});
-  
-          isRoadBuilding = true;
-  
-          dijkstraSetupPart2(prioQueue, distance, isBlockHere, processed, startPoint, endPoint)
-  
-      }
-  
-      function BFSSetupPart3(startPoint, endPoint, isBlockHere, distance, queue, isEndPointFound){
-          let topCell = queue.shift();
-          addNewStandBy(topCell.x, topCell.y);
-          standbys.push(deconstructCords(topCell.x, topCell.y))
-          if(endPoint.x == topCell.x && endPoint.y == topCell.y)
-              isEndPointFound = true;
-  
-          for(let i = 0; i < 4; ++i){
-              let newCordX = topCell.x + directions[i].x, newCordY = topCell.y + directions[i].y;
-              if(newCordX < 0 || newCordX >= numberOfRows || newCordY < 0 || newCordY >= numberOfCollums)
-                  continue;
-              if(isBlockHere[newCordX][newCordY])
-                  continue;
-  
-              if(distance[newCordX][newCordY] == INF){
-                  distance[newCordX][newCordY] = distance[topCell.x][topCell.y] + 1;
-                  queue.push({x: newCordX,  y: newCordY});
-              }
-          }
-  
-          BFSSetupPart2(startPoint, endPoint, isBlockHere, distance, queue, isEndPointFound);
-  
-      }
-  
-      function BFSSetupPart2(startPoint, endPoint, isBlockHere, distance, queue, isEndPointFound){
-          if(queue.length == 0){
-              globalDistance = distance;
-              removeStandBys();
-  
-              if(distance[endPoint.x][endPoint.y] == INF){
-                  alert("There are no paths");
-                  isRoadActive = false;
-              }else{
-                  isRoadActive = true;
-                  recursionForRoad(startPoint.x, startPoint.y, endPoint.x, endPoint.y, endPoint.x, endPoint.y, distance);
-              }
-          }else{
-              if(!isEndPointFound){
-                  setTimeout(() => {
-                      BFSSetupPart3(startPoint, endPoint, isBlockHere, distance, queue, isEndPointFound)
-                  }, 0);
-              }else{
-                  BFSSetupPart3(startPoint, endPoint, isBlockHere, distance, queue, isEndPointFound)
-              }
-          }
-  
-      }
-  
-      function visualiseBFS(){
-          removeRoads();
-          let startPoint = constructCords(cellWithStartPoint)
-          let endPoint = constructCords(cellWithEndPoint)
-  
-          let isBlockHere = create2DArray(numberOfRows, numberOfCollums);
-          let distance = create2DArray(numberOfRows, numberOfCollums);
-  
-          fill2DArray(distance, INF);
-          fill2DArrayForBlocks(isBlockHere);
-  
-          distance[startPoint.x][startPoint.y] = 0;
-  
-          let queue = [];
-  
-          queue.push({x: startPoint.x,  y: startPoint.y});
-  
-          isRoadBuilding = true;
-  
-          BFSSetupPart2(startPoint, endPoint, isBlockHere, distance, queue)
-      }
-  
       function setupOnClickForEachCell(table_id){
   
           document.getElementById("table-id").onmousedown = function() { 
@@ -404,17 +240,7 @@ function myFunction(x) {
                           isMousePressedWithBlockActive = false;
                           isMousePressedWithEraserActive = false;
                           if(ev.target != null && ev.target.firstChild != null){
-                              if(whichAlgo == 1){
-                                  if(ev.target.firstChild.id == "endPoint")
-                                      visualiseDijsktraAdded();
-                                  else if(isRoadActive)
-                                      visualiseDijkstra();
-                              }else{
-                                  if(ev.target.firstChild.id == "endPoint")
-                                      visualiseDijsktraAdded();
-                                  else if(isRoadActive)
-                                      visualiseBFS();
-                              }
+
                           }
                       }
                       TABLE.rows[i].cells[j].firstChild.onmousedown = function () { 
@@ -435,45 +261,54 @@ function myFunction(x) {
           }
       }
 
+      function resetStartAndEndPoint(){
+        let divForStartPoint = document.getElementById("source_div");
+        let divForEndPoint = document.getElementById("detector_div");
+        let existingStartPoint = document.getElementById("source");
+        let existingEndPoint = document.getElementById("detector");
+        divForStartPoint.appendChild(existingStartPoint);
+        divForEndPoint.appendChild(existingEndPoint);
+    }
+
       function activateBlock(){
-          $('#block-div').css("border", "3px solid #898373");
+          $('#shield_div').css("border", "3px solid #898373");
           isBlockActive = true;
       }
   
       function deactivateBlock(){
           if(isBlockActive){
-              $('#block-div').css("border", "3px solid #0157AE");
+              $('#shield_div').css("border", "3px solid #0157AE");
               isBlockActive = false;
               isMousePressedWithBlockActive = false;
           }
       }
   
       function activateEraser(){
-          $('#eraser-div').css("border", "3px solid #898373");
+          $('#eraser_div').css("border", "3px solid #898373");
           isEraserActive = true;
       }
   
       function deactivateEraser(){
           if(isEraserActive){
-              $('#eraser-div').css("border", "3px solid #0157AE");
+              $('#eraser_div').css("border", "3px solid #0157AE");
               isEraserActive = false;
               isMousePressedWithEraserActive = false;
           }
       }
   
       function recreateWholeTable(table_id){
-          //resetStartAndEndPoint();
-          //deactivateBlock();
-          //deactivateEraser();
-          //resetGlobalPoints();
-          //removeRoads();
+           resetStartAndEndPoint();
+           deactivateBlock();
+           deactivateEraser();
+          resetGlobalPoints();
+           removeRoads();
   
           TABLE = $(table_id);
           TABLE_HTML = "<table>"
       
           let sizeOfCell = 42, addedBorder = 15;
           let num_cols = Math.floor(($(window).width() - addedBorder) / sizeOfCell);
-          let num_rows = 18;
+          let num_rows = 14;
   
           numberOfCollums = num_cols;
           numberOfRows = num_rows
@@ -498,11 +333,61 @@ function myFunction(x) {
           }
           TABLE_HTML += "</table>"
           TABLE.html(TABLE_HTML);
-  
+          document.getElementById("distance").innerHTML = "Distanca: ";
           setupOnClickForEachCell("table-id")
       }
   
-      $('#eraser-div').click(function(evt){  
+      $('#start').click(function(evt){
+        if(cellWithStartPoint != -1 && cellWithEndPoint != -1){
+            let startPoint = constructCords(cellWithStartPoint)
+            let endPoint = constructCords(cellWithEndPoint)
+            var distance = Math.floor((Math.sqrt(Math.pow(endPoint.x-startPoint.x,2)+Math.pow(endPoint.y-startPoint.y,2)))*100)/100
+            document.getElementById("distance").innerHTML = "Distanca: " + distance;
+
+            console.log(sourceElement + " " + shield + " " + particle)
+        }
+        else
+            alert("Postavi izvor i detektor!");
+})
+
+        $('#source_1').click(function(evt){
+            sourceElement = "Uranijum";
+        })
+
+        $('#source_2').click(function(evt){
+            sourceElement = "Polonijum";
+        })
+
+        $('#source_3').click(function(evt){
+            sourceElement = "Kobalt 60";
+        })
+
+        $('#shield_1').click(function(evt){
+            shield = "Papir";
+        })
+
+        $('#shield_2').click(function(evt){
+            shield = "Aluminijum";
+        })
+
+        $('#shield_3').click(function(evt){
+            shield = "Olovo";
+        })
+
+        $('#particle_1').click(function(evt){
+            particle = "Alfa";
+        })
+
+        $('#particle_2').click(function(evt){
+            particle = "Beta";
+        })
+
+        $('#particle_3').click(function(evt){
+            particle = "Gama";
+        })
+
+
+      $('#eraser_div').click(function(evt){  
           if(!isEraserActive){
               activateEraser();
               deactivateBlock()
@@ -511,7 +396,7 @@ function myFunction(x) {
           }
       });
   
-      $('#block-div').click(function(evt){  
+      $('#shield_div').click(function(evt){  
           if(!isBlockActive){
               activateBlock();
               deactivateEraser();
@@ -520,57 +405,14 @@ function myFunction(x) {
           }
       });
   
-      window.onclick = function(event) {
-          if (!event.target.matches('.dropdown-start-button')) {
-              let dropdowns = document.getElementsByClassName("dropdown-content-div");
-              for(let i = 0; i < dropdowns.length; i++) {
-                  var openDropdown = dropdowns[i];
-                  if (openDropdown.classList.contains('show')) {
-                      openDropdown.classList.remove('show');
-                  }
-              }
-          }
-      } 
-      
-      $('#refresh-table-button').click(function(evt){
-          if(!isRoadBuilding)
-              $(function(){recreateWholeTable("#table-id")});
-      })
-  
-      $('#algorithm-1').click(function(evt){
-          whichAlgo = 1;
-      })
-  
-      $('#algorithm-2').click(function(evt){
-          whichAlgo = 2;
-      })
-  
-      $('#visualize-table-button').click(function(evt){
-          if(!isRoadBuilding){
-              if(cellWithStartPoint != -1 && cellWithEndPoint != -1){
-                  if(whichAlgo == 1)
-                      visualiseDijkstra();
-                  else if(whichAlgo == 2)
-                      visualiseBFS();
-              }
-              else
-                  alert("Place start and end point")
-          }
-      })
-  
-      $('#devisualize-table-button').click(function(evt){
-          if(!isRoadBuilding)
-              removeRoads();
-      })
-  
       $(window).on("resize", function(){
           if(!isRoadBuilding)
               $(function(){recreateWholeTable("#table-id")});
       });
   
       var ignoreClickOnMeElement1 = document.getElementById('table-id');
-      var ignoreClickOnMeElement2 = document.getElementById('block-div');
-      var ignoreClickOnMeElement3 = document.getElementById('eraser-div');
+      var ignoreClickOnMeElement2 = document.getElementById('shield_div');
+      var ignoreClickOnMeElement3 = document.getElementById('eraser_div');
       var ignoreClickOnMeElement4 = document.getElementsByClassName('block');
       
   
@@ -587,6 +429,4 @@ function myFunction(x) {
       
       $(function(){recreateWholeTable("#table-id")});
   }
-  
-  
   let TABLE = table();
