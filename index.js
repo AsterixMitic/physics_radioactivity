@@ -86,7 +86,7 @@ let particle = "Alfa";
       function addNewBlock(obj){
           if(!isRoadBuilding){
               const newBlock = document.createElement("img");
-              newBlock.src = "img\\x.png"
+              newBlock.src = document.getElementById("shield").src;  
               newBlock.class = "block"
               newBlock.draggable = false;
               if(obj.childElementCount == 0){
@@ -109,7 +109,7 @@ let particle = "Alfa";
   
       function addNewRoad(i, j){
           const newRoad = document.createElement("img");
-          newRoad.src = "img\\x.png"        
+          newRoad.src = document.getElementById("shield").src;        
           newRoad.draggable = false;
           newRoad.class = "road"
           let obj = document.getElementById(String(deconstructCords(i, j)));
@@ -118,18 +118,7 @@ let particle = "Alfa";
               obj.appendChild(newRoad)
           }
       }
-  
-      function addNewStandBy(i, j){
-          const newStandBy = document.createElement("img");
-          newStandBy.src = "img\\x.png"        
-          newStandBy.draggable = false;
-          newStandBy.class = "standby"
-          let obj = document.getElementById(String(deconstructCords(i, j)));
-  
-          if(obj.childElementCount == 0){
-              obj.appendChild(newStandBy)
-          }
-      }
+
       
       function removeBlock(obj){
           if(!isRoadBuilding){
@@ -364,14 +353,17 @@ let particle = "Alfa";
 
         $('#shield_1').click(function(evt){
             shield = "Papir";
+            document.getElementById("shield").src="img\\paper.png"
         })
 
         $('#shield_2').click(function(evt){
             shield = "Aluminijum";
+            document.getElementById("shield").src="img\\aluminium.png"
         })
 
         $('#shield_3').click(function(evt){
             shield = "Olovo";
+            document.getElementById("shield").src="img\\lead.png"
         })
 
         $('#particle_1').click(function(evt){
@@ -420,7 +412,7 @@ let particle = "Alfa";
           var isClickInsideTable1 = ignoreClickOnMeElement1.contains(event.target);
           var isClickInsideTable2 = ignoreClickOnMeElement2.contains(event.target);
           var isClickInsideTable3 = ignoreClickOnMeElement3.contains(event.target);
-          var isClickInsideTable4 = ignoreClickOnMeElement4.contains(event.target);
+          //var isClickInsideTable4 = ignoreClickOnMeElement4.contains(event.target);
           if (!isClickInsideTable1 && !isClickInsideTable2 && !isClickInsideTable3 && !isClickInsideTable4) {
               deactivateBlock();
               deactivateEraser();
