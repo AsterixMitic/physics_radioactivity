@@ -2,7 +2,6 @@ function dropdownFunction(x) {
     document.getElementById(x).classList.toggle("show");
   }
   
-  // Close the dropdown if the user clicks outside of it
   window.onclick = function(event) {
     if (!event.target.matches('.dropButton')) {
       var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -16,13 +15,19 @@ function dropdownFunction(x) {
     }
   }
 
+
 let cellWithStartPoint = -1, cellWithEndPoint = -1;
 let listOFBlockCells = [];
 let isRoadBuilding = false;
 
-let sourceElement = "Uranijum";
+let isChanged = false;
+
+let sourceElement = "Plutonijum 239";
 let shield = "Papir";
-let particle = "Alfa";
+
+let isCalculating = false;
+let radiation=0;
+let distance=0;
 
   function allowDrop(ev) {
       ev.preventDefault();
@@ -33,16 +38,18 @@ let particle = "Alfa";
     
   function drop(ev) {
       ev.preventDefault();
-      if(!isRoadBuilding){
-          let data = ev.dataTransfer.getData("text");
-          if(ev.target.nodeName != 'IMG' && document.getElementById(data) != null){
-              if(data == "source")
-                  cellWithStartPoint = parseInt(ev.target.id);
-              if(data == "detector")
-                  cellWithEndPoint = parseInt(ev.target.id);
-              ev.target.appendChild(document.getElementById(data));    
-          }
-      }
+        let data = ev.dataTransfer.getData("text");
+        if(ev.target.nodeName != 'IMG' && document.getElementById(data) != null){
+            if(data == "source"){
+                cellWithStartPoint = parseInt(ev.target.id);
+                isChanged=true;
+            }
+            if(data == "detector"){
+                cellWithEndPoint = parseInt(ev.target.id);
+                isChanged=true;
+            }
+            ev.target.appendChild(document.getElementById(data));    
+        }
   }
   
   let table = () => {
@@ -51,21 +58,13 @@ let particle = "Alfa";
       let isMousePressedWithBlockActive = false;
       let isMousePressedWithEraserActive = false;
       let numberOfCollums = 0;
-      let numberOfRows = 0;
-      let directions = [{x:0, y:-1}, {x:-1, y:0}, {x:0, y:1}, {x:1, y:0}];
       let isRoadActive = false;
       let roads = []
-      let standbys = []
   
       function constructCords(numberOfCell){
           let x = Math.floor((numberOfCell - 1) / numberOfCollums);
           let y = (numberOfCell - 1) % numberOfCollums;
           return {x, y};
-      }
-  
-      function deconstructCords(i, j){
-          let ret = i * numberOfCollums + j + 1;
-          return ret;
       }
   
       function resetGlobalPoints(){
@@ -87,7 +86,7 @@ let particle = "Alfa";
           if(!isRoadBuilding){
               const newBlock = document.createElement("img");
               newBlock.src = document.getElementById("shield").src;  
-              newBlock.class = "block"
+              newBlock.class = shield
               newBlock.draggable = false;
               if(obj.childElementCount == 0){
                   obj.appendChild(newBlock)
@@ -106,24 +105,11 @@ let particle = "Alfa";
               }
           }
       }
-  
-      function addNewRoad(i, j){
-          const newRoad = document.createElement("img");
-          newRoad.src = document.getElementById("shield").src;        
-          newRoad.draggable = false;
-          newRoad.class = "road"
-          let obj = document.getElementById(String(deconstructCords(i, j)));
-  
-          if(obj.childElementCount == 0){
-              obj.appendChild(newRoad)
-          }
-      }
 
-      
       function removeBlock(obj){
           if(!isRoadBuilding){
               let child = obj.lastElementChild;
-              if(child != null && child.class == "block"){
+              if(child != null && (child.class == "Papir" || child.class=="Olovo" || child.class=="Aluminijum")){
                   obj.removeChild(child);
                   removeBlockCellFromArray(parseInt(obj.id))
                   if(isRoadActive)
@@ -141,68 +127,6 @@ let particle = "Alfa";
                   obj.removeChild(child);
           }
           roads = [];
-      }
-  
-      function removeStandBys(){
-          for(let i = 0; i < standbys.length; ++i){
-              let obj = document.getElementById(String(standbys[i]));
-              let child = obj.lastElementChild;
-              if(child != null && child.class == "standby")
-                  obj.removeChild(child);
-          }
-          standbys = []
-      }
-  
-      function fill2DArray(array, value){
-          for(let i = 0; i < numberOfRows; ++i){
-              for(let j = 0; j < numberOfCollums; ++j){
-                  array[i][j] = value;
-              }
-          }
-      }
-  
-      function fill2DArrayForBlocks(array){
-          for(let i = 0; i < numberOfRows; ++i){
-              for(let j = 0; j < numberOfCollums; ++j){
-                  array[i][j] = false;
-              }
-          }
-  
-          for(let i = 0; i < listOFBlockCells.length; ++i){
-              let cords = constructCords(listOFBlockCells[i]);
-              array[cords.x][cords.y] = true;
-          }
-      }
-  
-      function create2DArray(d1, d2) {
-          var arr = new Array(d1), i, l;
-          for(i = 0, l = d1; i < l; i++) {
-              arr[i] = new Array(d2);
-          }
-          return arr;
-      }
-  
-      function recursionForRoad(fi, fj, i, j, ei, ej, distance){
-          if(fi == i && fj == j){
-              isRoadBuilding = false;   
-              return
-          }
-          if(i != ei || j != ej){
-              addNewRoad(i, j);
-              roads.push(deconstructCords(i, j))
-          }
-  
-          setTimeout(() => {
-              for(let ind = 0; ind < 4; ++ind){
-                  let newI = i + directions[ind].x, newJ = j + directions[ind].y;
-                  if(newI < 0 || newI >= numberOfRows || newJ < 0 || newJ >= numberOfCollums)
-                      continue;
-                  if(distance[newI][newJ] + 1 == distance[i][j]){
-                      recursionForRoad(fi, fj, newI, newJ, ei, ej, distance);
-                      return;
-                  }                
-              }
-          }, 30);
       }
   
       function setupOnClickForEachCell(table_id){
@@ -323,28 +247,115 @@ let particle = "Alfa";
           TABLE_HTML += "</table>"
           TABLE.html(TABLE_HTML);
           document.getElementById("distance").innerHTML = "Distanca: ";
+          radiation=0;
           setupOnClickForEachCell("table-id")
+          clearInterval(interval)
       }
-  
+
+      //Checks if source directly aligned with detector
+      let isNotified = false;
+      let numShield = [];
+
+      function calculateRadiation(){
+        let startPoint = constructCords(cellWithStartPoint)
+        let endPoint = constructCords(cellWithEndPoint)
+        var isDetectingRadiation = true;
+        if(isChanged){
+            distance = Math.floor((Math.sqrt(Math.pow(endPoint.x-startPoint.x,2)+Math.pow(endPoint.y-startPoint.y,2)))*100)/100
+            document.getElementById("distance").innerHTML = "Distanca: " + distance;
+            numShield = findShields(startPoint,endPoint);
+            isChanged=false;
+        }
+
+        if(endPoint.x!==startPoint.x){
+            if(!isNotified){
+            alert("Detektor detektuje samo snop iz izvora uperenog direktno ka njemu.");
+            isNotified = true;
+            }
+            isDetectingRadiation = false;
+            radiation=0;
+        }
+
+        let radiationPlace = document.getElementById("radioactivity");
+        if(isDetectingRadiation){
+            //Calculations 
+
+            // linear coefficient of abosrbption
+            // paper - 0.05cm-1 //random value
+            // al - 0.136 cm−1
+            // pb - 0.596 cm−1
+
+            //Formula for calculating 
+            //I = I0*e^-Md
+            //I - intensity 
+            //M - linear coefficient
+            //d - distance
+            var m = 0.1 + 0.05 * numShield[0] + 0.136 * numShield[1] + 0.596 * numShield[2];
+
+            //Intensity of elements
+            // plutonium - 5.156
+            // strontium - 0.546
+            // kobalt - 1.1732
+            var intensity;
+            if(sourceElement == "Plutonijum 239" ){
+                intensity = 0.05156;
+            }else if(sourceElement == "Strontium 90"){
+                intensity = 5.46;
+            } else{
+                intensity = 117.32;
+            }
+
+            radiation = Math.floor(intensity*Math.E**(-1*m*distance)*100)/100            
+            console.log(radiation + " = " + intensity + " "+ m + " " + distance)
+            if (Math.random()>0.05){
+                radiation = radiation+1
+            }
+
+        }
+        radiationPlace.innerHTML = "Radioaktivnost: " + radiation;
+      }
+
+      function findShields(startPoint, endPoint){
+            let TABLE = document.getElementById('table-id');
+
+            var numLe=0;
+            var numAl=0;
+            var numPa=0;
+            
+            console.log(startPoint.y + " " + endPoint.y)
+            for(i=startPoint.y;i<endPoint.y ;++i){
+
+                if(TABLE.rows[startPoint.x].cells[i].firstChild.firstChild!=null){
+                    if(TABLE.rows[startPoint.x].cells[i].firstChild.firstChild.class==="Papir"){
+                        numPa++;
+                    }  else if(TABLE.rows[startPoint.x].cells[i].firstChild.firstChild.class==="Aluminijum"){
+                        numAl++;
+                    } else if(TABLE.rows[startPoint.x].cells[i].firstChild.firstChild.class==="Olovo"){
+                        numLe++;
+                    }
+                }
+                
+            }
+            
+            return [numPa, numAl, numLe];
+      }
+
+      var interval;
       $('#start').click(function(evt){
         if(cellWithStartPoint != -1 && cellWithEndPoint != -1){
-            let startPoint = constructCords(cellWithStartPoint)
-            let endPoint = constructCords(cellWithEndPoint)
-            var distance = Math.floor((Math.sqrt(Math.pow(endPoint.x-startPoint.x,2)+Math.pow(endPoint.y-startPoint.y,2)))*100)/100
-            document.getElementById("distance").innerHTML = "Distanca: " + distance;
-
-            console.log(sourceElement + " " + shield + " " + particle)
+            console.log(sourceElement + " " + shield)
+            interval = setInterval(calculateRadiation,1000);
         }
         else
             alert("Postavi izvor i detektor!");
-})
+        })
 
         $('#source_1').click(function(evt){
-            sourceElement = "Uranijum";
+            sourceElement = "Plutonijum 239";
         })
 
         $('#source_2').click(function(evt){
-            sourceElement = "Polonijum";
+            sourceElement = "Strontium 90";
         })
 
         $('#source_3').click(function(evt){
@@ -364,18 +375,6 @@ let particle = "Alfa";
         $('#shield_3').click(function(evt){
             shield = "Olovo";
             document.getElementById("shield").src="img\\lead.png"
-        })
-
-        $('#particle_1').click(function(evt){
-            particle = "Alfa";
-        })
-
-        $('#particle_2').click(function(evt){
-            particle = "Beta";
-        })
-
-        $('#particle_3').click(function(evt){
-            particle = "Gama";
         })
 
 
@@ -405,20 +404,19 @@ let particle = "Alfa";
       var ignoreClickOnMeElement1 = document.getElementById('table-id');
       var ignoreClickOnMeElement2 = document.getElementById('shield_div');
       var ignoreClickOnMeElement3 = document.getElementById('eraser_div');
-      var ignoreClickOnMeElement4 = document.getElementsByClassName('block');
-      
   
       document.addEventListener('mousedown', function(event) {
           var isClickInsideTable1 = ignoreClickOnMeElement1.contains(event.target);
           var isClickInsideTable2 = ignoreClickOnMeElement2.contains(event.target);
           var isClickInsideTable3 = ignoreClickOnMeElement3.contains(event.target);
-          //var isClickInsideTable4 = ignoreClickOnMeElement4.contains(event.target);
-          if (!isClickInsideTable1 && !isClickInsideTable2 && !isClickInsideTable3 && !isClickInsideTable4) {
+          if (!isClickInsideTable1 && !isClickInsideTable2 && !isClickInsideTable3) {
               deactivateBlock();
               deactivateEraser();
           }
       });
       
+
+
       $(function(){recreateWholeTable("#table-id")});
   }
   let TABLE = table();
