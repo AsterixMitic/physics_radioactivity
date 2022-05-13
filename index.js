@@ -248,6 +248,7 @@ let distance=0;
           TABLE.html(TABLE_HTML);
           document.getElementById("distance").innerHTML = "Distanca: ";
           radiation=0;
+          document.getElementById("radioactivity").innerHTML = "Radioaktivnost: ";
           setupOnClickForEachCell("table-id")
           clearInterval(interval)
       }
@@ -305,10 +306,15 @@ let distance=0;
                 intensity = 117.32;
             }
 
-            radiation = Math.floor(intensity*Math.E**(-1*m*distance)*100)/100            
-            console.log(radiation + " = " + intensity + " "+ m + " " + distance)
-            if (Math.random()>0.05){
-                radiation = radiation+1
+            if((sourceElement == "Plutonijum 239" && numShield[0]>=1) || (sourceElement == "Strontium 90" && numShield[1]>=1)){
+                radiation=0;
+            }
+            else {
+                radiation = Math.floor(intensity*Math.E**(-1*m*distance)*100)/100            
+                console.log(radiation + " = " + intensity + " "+ m + " " + distance)
+                if (Math.random()>0.05){
+                    radiation += 1
+                }
             }
 
         }
